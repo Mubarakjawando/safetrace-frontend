@@ -142,6 +142,15 @@ export default function MapPage() {
     e.preventDefault();
     setStatusMessage('');
 
+    // Unlock speech synthesis on mobile browsers (iOS Safari, Chrome Android)
+    // by speaking a near-silent utterance synchronously within this click event,
+    // before any async code (geolocation) breaks the user-gesture context.
+    if ('speechSynthesis' in window) {
+      const unlock = new SpeechSynthesisUtterance(' ');
+      unlock.volume = 0;
+      window.speechSynthesis.speak(unlock);
+    }
+
     if (!selectedDestination) {
       setStatusMessage('Please search and select a destination first.');
       return;
