@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+
+// MapLibre v6 requires the worker to be loaded via Vite's ?worker&url import
+// so its sibling maplibre-gl-shared.mjs file gets bundled alongside it correctly.
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 import { useAuth } from '../context/AuthContext';
 import { startJourney, endJourney } from '../services/journey';
 import { getSocket, disconnectSocket } from '../services/socket';
@@ -50,6 +55,10 @@ export default function MapPage() {
     mapRef.current.on('load', () => {
       mapRef.current.resize();
       setMapLoaded(true);
+    });
+
+    mapRef.current.on('error', (e) => {
+      console.error('MapLibre error:', e.error?.message || e);
     });
 
     return () => {
